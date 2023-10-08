@@ -61,7 +61,7 @@ export class PasswordService {
     return true;
   }
 
-  async newPassword(username: string, password: string) {
+  async newPassword(userId: string, password: string) {
     const currentPasswords = await this.getAllOfUser(userId);
     if (currentPasswords.length !== 0) {
       const passwordsToCheck = currentPasswords.slice(

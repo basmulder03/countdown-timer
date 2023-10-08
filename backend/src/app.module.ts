@@ -7,6 +7,8 @@ import { UsersModule } from './users/users.module';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { PasswordModule } from './password/password.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -15,8 +17,37 @@ import { PasswordModule } from './password/password.module';
     UsersModule,
     PrismaModule,
     PasswordModule,
+    ThrottlerModule.forRoot([
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100,
+      },
+      {
+        name: 'medium',
+        ttl: 30000,
+        limit: 75,
+      },
+      {
+        name: 'short',
+        ttl: 10000,
+        limit: 45,
+      },
+      {
+        name: 'super-short',
+        ttl: 1000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [
+    AppService,
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule {}
